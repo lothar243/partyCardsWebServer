@@ -23,9 +23,20 @@ public class promptServerToReportData {
         PartyCardsInterface myInterface = partyCardsService.getPort(PartyCardsInterface.class);
 
 
+//        System.out.println("player 0 hand: " + arrayToString(myInterface.getHand(0, 0)));
+//        System.out.println("player 1 hand: " + arrayToString(myInterface.getHand(0, 1)));
         myInterface.reportCurrentStatus();
 
 
     }
-
+    public static String arrayToString(String[] input) {
+        String output = "";
+        if(input.length > 0) {
+            output = input[0];
+        }
+        for(int i = 1; i < input.length; i++) {
+            output += ", " + input[i];
+        }
+        return output;
+    }
 }

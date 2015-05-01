@@ -1,6 +1,8 @@
 package main.java;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 
 // ====================================================================================================================
@@ -28,28 +30,28 @@ public class FileIO {
     // Reads in from <filename>, a list of strings representing the text to be displayed on the white cards.
     // @return - A "pile" of cards.
     // ===============================================================================================================
-	public ArrayList<Card> readCards(String filename) {
-		ArrayList<Card> cards = new ArrayList<Card>();
-		
-		try
+    public ArrayList<Card> readCards(String filename) {
+        ArrayList<Card> cards = new ArrayList<Card>();
+
+        try
         {
             FileReader FileIO = new FileReader(filename);
             BufferedReader in = new BufferedReader(FileIO);
-			String nextLine;
+            String nextLine;
             while((nextLine = in.readLine()) != null) {
                 cards.add(new Card(nextLine));
             }
-			in.close();
+            in.close();
             FileIO.close();
-		}
+        }
         catch (IOException e)
         {
-			// log the exception
-		}
-		
-		return cards;
-	}
+            // log the exception
+        }
+
+        return cards;
+    }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	
+
 }
