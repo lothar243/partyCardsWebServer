@@ -25,14 +25,14 @@ public class PartyCardsServer {
         whiteCards = cardReader.readCards(FileIO.WHITE_CARDS_FILENAME);
         blackCards = cardReader.readCards(FileIO.BLACK_CARDS_FILENAME);
 
-        final String DEBUG = "true";
+        final String DEBUG = "false";
 
         System.setProperty("javax.xml.bind.JAXBContext", "com.sun.xml.internal.bind.v2.ContextFactory");
         System.setProperty("com.sun.xml.ws.transport.http.client.HttpTransportPipe.dump", DEBUG);
         System.setProperty("com.sun.xml.internal.ws.transport.http.client.HttpTransportPipe.dump", DEBUG);
         System.setProperty("com.sun.xml.ws.transport.http.HttpAdapter.dump", DEBUG);
         System.setProperty("com.sun.xml.internal.ws.transport.http.HttpAdapter.dump", DEBUG);
-        System.out.println("Publising on " + "http://" + serverIp + ":52244/ws/partyCards");
+        System.out.println("Publishing on " + "http://" + serverIp + ":52244/ws/partyCards");
 
         Endpoint.publish("http://" + serverIp + ":52244/ws/partyCards", new PartyCardsInterfaceImpl());
     }
