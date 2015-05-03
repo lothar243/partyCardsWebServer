@@ -79,4 +79,12 @@ public interface PartyCardsInterface {
     public static final int ROUND_SUMMARY = 17;
     String [] roundSummary(int gameId);
 
+    public static final int GET_GAME_DATA = 18;
+    InGameData getGameData(int gameId, int playerId);
+
+    public static final int GET_BASIC_GAME_DATA = 19;
+    BasicGameData [] getBasicGameData();
+
+    public static final int GET_BASIC_GAME_DATA_SINGLE_GAME = 20;
+    BasicGameData getBasicGameDataSingleGame(int gameId);
 }

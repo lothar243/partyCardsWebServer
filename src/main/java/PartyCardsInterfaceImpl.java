@@ -226,7 +226,9 @@ public class PartyCardsInterfaceImpl implements PartyCardsInterface {
             // send the normal player's hand
             String[] output;
             if(currentCardCzar.get(gameId) == playerId) {
-                output = new String[]{"You're the card czar! Waiting for the other players"};
+                output = new String[2];
+                output[0] = "You are the card czar, and must wait on the other players";;
+                output[1] = generateScoreReport(gameId);
             }
             else {
                 output = new String[HANDSIZE];
@@ -254,13 +256,11 @@ public class PartyCardsInterfaceImpl implements PartyCardsInterface {
                     System.out.println("Shuffledplayerqueue is too small");
                     return new String[]{"Error, for some reason shuffledPlayerQueue generated as the wrong size"};
                 }
-                System.out.println("ShuffledQueue before shuffling: " + toString(shuffledPlayerQueue.get(gameId)));
                 //shuffle the ids
                 Collections.shuffle(shuffledPlayerQueue.get(gameId));
 
             }
 
-            System.out.println("shuffledPlayerQueue after shuffling: " + toString(shuffledPlayerQueue.get(gameId)));
 
             // now translate these ids to the card content
             String[] output = new String[shuffledPlayerQueue.get(gameId).size()];
@@ -268,8 +268,6 @@ public class PartyCardsInterfaceImpl implements PartyCardsInterface {
                 // for each card, write the contents to output
                 // shuffledPlayerQueue randomizes the players, so we get the card selected by the i^th player
                 int unshuffledPlayerId = shuffledPlayerQueue.get(gameId).get(i);
-                System.out.println("0" + unshuffledPlayerId);
-                System.out.println("1" + playerCardSelection.get(gameId).get(unshuffledPlayerId));
                 int cardIndexInUnshuffledDeck = playerHand.get(gameId).get(unshuffledPlayerId).get(playerCardSelection.get(gameId).get(unshuffledPlayerId));
                 output[i] = PartyCardsServer.whiteCards.get(cardIndexInUnshuffledDeck).content;
             }
@@ -311,7 +309,7 @@ public class PartyCardsInterfaceImpl implements PartyCardsInterface {
             // remember this round's card czar selection
             lastRoundCard.set(gameId, playerHand.get(gameId).get(winningPlayer).get(playerCardSelection.get(gameId).get(winningPlayer)));
             lastRoundWinningPlayer.set(gameId, winningPlayer);
-
+            System.out.println("dealing next cards");
             dealNextTurn(gameId);
 
             return 0;
@@ -350,11 +348,13 @@ public class PartyCardsInterfaceImpl implements PartyCardsInterface {
         increment(turnNumber, gameId);
 
         // for each normal player, replace their chosen card with the next white card in the deck
-        for(int playerId = 0; playerId < playerNames.size(); playerId++) {
+        for(int playerId = 0; playerId < playerNames.get(gameId).size(); playerId++) {
             //todo check to see if we're out of cards, if so, reshuffle the deck
             if(currentCardCzar.get(gameId) != playerId) {
-                playerHand.get(gameId).get(playerId).set(playerCardSelection.get(gameId).get(playerId), gameWhiteDeck.get(gameId)[currentWhiteIndex.get(gameId)] );
-                currentWhiteIndex.set(gameId, currentWhiteIndex.get(gameId) + 1);
+                int handIndexToReplace = playerCardSelection.get(gameId).get(playerId);
+                int deckIndexOfNewCard = gameWhiteDeck.get(gameId)[currentWhiteIndex.get(gameId)];
+                playerHand.get(gameId).get(playerId).set(handIndexToReplace, deckIndexOfNewCard );
+                increment(currentWhiteIndex, gameId);
             }
         }
 
@@ -416,6 +416,7 @@ public class PartyCardsInterfaceImpl implements PartyCardsInterface {
 
     public void reportCurrentStatus() {
 
+        System.out.println("\n\n-----");
         for(int gameId = 0; gameId < gameNumberIterator; gameId++) {
             System.out.print("Game " + gameId + ", name: " + gameNames.get(gameId) + ", Players: ");
             for(int j = 0; j < playerNames.get(gameId).size(); j++) {
@@ -423,15 +424,17 @@ public class PartyCardsInterfaceImpl implements PartyCardsInterface {
             }
             System.out.println();
             System.out.println("New: " + gameIsNew.get(gameId) + ", Active: " + gameIsActive.get(gameId));
-            System.out.println("Turn number: " + turnNumber.get(gameId) + ", turn phase: " + turnPhase.get(gameId) + ", lastRoundCard: " + lastRoundCard + ", selections: " + toString(playerCardSelection.get(gameId)));
+            System.out.println("Turn number: " + turnNumber.get(gameId) + ", turn phase: " + turnPhase.get(gameId) + ", lastRoundCard: " + lastRoundCard.get(gameId) + ", selections: " + toString(playerCardSelection.get(gameId)));
             if(!gameIsNew.get(gameId)) {
-                for(int playerNum = 0; playerNum < playerNames.get(gameId).size(); playerNum++) {
-                    System.out.println("Player hand: " + playerHand.get(gameId).get(playerNum));
+                for(int playerId = 0; playerId < playerNames.get(gameId).size(); playerId++) {
+                    System.out.print("Player hand: " + playerHand.get(gameId).get(playerId));
+                    System.out.println(" - " + toString(getHand(gameId, playerId)));
                 }
             }
+            System.out.println("scoring player: " + lastRoundWinningPlayer.get(gameId) + ", with card: " + lastRoundCard.get(gameId));
+            System.out.println();
         }
     }
-
 
     // returns [turn number][phase number][last chosen card]
     @Override
@@ -502,6 +505,69 @@ public class PartyCardsInterfaceImpl implements PartyCardsInterface {
         return output;
     }
 
+
+    public InGameData getGameData(int gameId, int playerId) {
+        if(gameId >= gameNumberIterator || gameId < 0 || playerId >= playerNames.get(gameId).size() || playerId < 0) {
+            //gameId is out of bounds
+            InGameData errorGame = new InGameData();
+            errorGame.blackCard = "error retrieving data";
+            errorGame.hand = new String[]{"error retrieving data"};
+            return errorGame;
+        }
+        InGameData game = new InGameData();
+        game.blackCard = getBlackCardString(currentBlackIndex.get(gameId));
+        game.hand = new String[playerHand.get(gameId).get(playerId).size()];
+
+        //roundText
+        if(turnNumber.get(gameId) == 1) {
+            game.roundText = "Round 1";
+        }
+        else {
+            game.roundText = "Round 2, previous winner: " + playerNames.get(gameId).get(lastRoundWinningPlayer.get(gameId));
+            game.roundText += " with\n" + getWhiteCardString(lastRoundCard.get(gameId));
+        }
+        game.playerId = playerId;
+
+        //playerIsCardCzar
+        if(playerId == currentCardCzar.get(gameId)) {
+            game.playerIsCardCzar = 1;
+        }
+        else {
+            game.playerIsCardCzar = 0;
+        }
+        game.turnPhase = turnPhase.get(gameId);
+        game.turnNumber = turnNumber.get(gameId);
+        game.numberOfPlayersChoosing = 0;
+
+        game.hand = getHand(gameId, playerId);
+
+        return game;
+    }
+
+    @Override
+    public BasicGameData [] getBasicGameData() {
+        BasicGameData [] output = new BasicGameData[gameNumberIterator];
+        for(int i = 0; i < output.length; i++) {
+            output[i] = new BasicGameData();
+            output[i].gameId = i;
+            output[i].gameName = gameNames.get(i);
+            output[i].gameIsNew = gameIsNew.get(i);
+            output[i].playerNames = makeStringArray(playerNames.get(i));
+        }
+        return output;
+    }
+
+    @Override
+    public BasicGameData getBasicGameDataSingleGame(int gameId) {
+        BasicGameData output = new BasicGameData();
+        output = new BasicGameData();
+        output.gameId = gameId;
+        output.gameName = gameNames.get(gameId);
+        output.gameIsNew = gameIsNew.get(gameId);
+        output.playerNames = makeStringArray(playerNames.get(gameId));
+        return output;
+    }
+
     public void startNewGame(int gameId) {
         if(!gameIsNew.get(gameId)) {
             return; // game has already started
@@ -565,5 +631,26 @@ public class PartyCardsInterfaceImpl implements PartyCardsInterface {
 
         currentWhiteIndex.set(gameId, whiteDeckIndexThisGame);
         currentBlackIndex.set(gameId, 0);
+    }
+
+    private String[] makeStringArray(ArrayList<String> input) {
+        String[] output = new String[input.size()];
+        for(int i = 0; i < output.length; i++) {
+            output[i] = (String) input.get(i);
+        }
+        return output;
+    }
+    private String getWhiteCardString(int indexNumber) {
+        return PartyCardsServer.whiteCards.get(indexNumber).content;
+    }
+    private String getBlackCardString(int indexNumber) {
+        return PartyCardsServer.blackCards.get(indexNumber).content;
+    }
+    private String generateScoreReport(int gameId) {
+        String output = "Round " + turnNumber.get(gameId) + " score:\n";
+        for(int playerId = 0; playerId < playerNames.get(gameId).size(); playerId++) {
+            output += playerNames.get(gameId).get(playerId) + ": " + playerPoints.get(gameId).get(playerId) + "\n";
+        }
+        return output;
     }
 }

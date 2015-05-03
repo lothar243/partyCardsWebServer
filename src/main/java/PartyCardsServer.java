@@ -25,7 +25,7 @@ public class PartyCardsServer {
         whiteCards = cardReader.readCards(FileIO.WHITE_CARDS_FILENAME);
         blackCards = cardReader.readCards(FileIO.BLACK_CARDS_FILENAME);
 
-        final String DEBUG = "false";
+        final String DEBUG = "true";
 
         System.setProperty("javax.xml.bind.JAXBContext", "com.sun.xml.internal.bind.v2.ContextFactory");
         System.setProperty("com.sun.xml.ws.transport.http.client.HttpTransportPipe.dump", DEBUG);

@@ -27,21 +27,47 @@ public class PartyCardsTestClient {
         System.out.println("list players in game 1: " + arrayToString(myInterface.listPlayers(1)));
         myInterface.startNewGame(0);
         reportGameStatus();
-        System.out.println("player 1 - choose card 1, number of cards remaining: " + myInterface.chooseCard(0, 1, 1));
+        System.out.println("Action: player 1 chooses card 1, number of cards remaining: " + myInterface.chooseCard(0, 1, 1));
         reportGameStatus();
-        System.out.println("player 0 - choose card 0, number of cards remaining: " + myInterface.chooseCard(0, 0, 0));
+        System.out.println("Action: player 0 chooses card 0, number of cards remaining: " + myInterface.chooseCard(0, 0, 0));
         reportGameStatus();
-        System.out.println("player 0 - choose card 2, number of cards remaining: " + myInterface.chooseCard(0, 0, 2));
+        System.out.println("Action: player 0 chooses card 2, number of cards remaining: " + myInterface.chooseCard(0, 0, 2));
         reportGameStatus();
-        System.out.println("player 1 - choose card 0, number of cards remaining: " + myInterface.chooseCard(0, 1, 0));
+        System.out.println("Action: player 1 chooses card 0, number of cards remaining: " + myInterface.chooseCard(0, 1, 0));
+        reportGameStatus();
+        System.out.println("Action: player 1 chooses card 3, number of cards remaining: " + myInterface.chooseCard(0, 1, 3));
+        reportGameStatus();
+        System.out.println("Action: player 0 chooses card 0, number of cards remaining: " + myInterface.chooseCard(0, 0, 0));
+        reportGameStatus();
+        System.out.println("Action: player 0 chooses card 4, number of cards remaining: " + myInterface.chooseCard(0, 0, 4));
+        reportGameStatus();
+        System.out.println("Action: player 1 chooses card 0, number of cards remaining: " + myInterface.chooseCard(0, 1, 0));
+        reportGameStatus();
+        System.out.println("Action: player 1 chooses card 5, number of cards remaining: " + myInterface.chooseCard(0, 1, 5));
+        reportGameStatus();
+        System.out.println("Action: player 0 chooses card 0, number of cards remaining: " + myInterface.chooseCard(0, 0, 0));
+        reportGameStatus();
+        System.out.println("Action: player 0 chooses card 6, number of cards remaining: " + myInterface.chooseCard(0, 0, 6));
+        reportGameStatus();
+        System.out.println("Action: player 1 chooses card 0, number of cards remaining: " + myInterface.chooseCard(0, 1, 0));
         reportGameStatus();
 
+
+        myInterface.getBasicGameData();
 
 
 
     }
 
     public static void reportGameStatus() {
+        System.out.println("\n ----");
+        myInterface.reportCurrentStatus();
+        System.out.println("player 0: " + myInterface.getGameData(0, 0).toString());
+        System.out.println("player 1: " + myInterface.getGameData(0, 1).toString());
+    }
+
+
+    public static void reportGameStatus2() {
         myInterface.reportCurrentStatus();
         System.out.println("--report--\n" + arrayToString(myInterface.roundSummary(0)));
         if(myInterface.playerIsCardCzar(0,0) == 1) {
@@ -61,7 +87,7 @@ public class PartyCardsTestClient {
             output = input[0];
         }
         for(int i = 1; i < input.length; i++) {
-            output += ", " + input[i];
+            output += ", " + i + " " + input[i];
         }
         return output;
     }
