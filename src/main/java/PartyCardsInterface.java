@@ -11,23 +11,6 @@ import javax.jws.soap.SOAPBinding.Style;
 public interface PartyCardsInterface {
 
 
-//    @WebMethod Integer [] getGames(); // return array of game names
-//    @WebMethod int createNewGame(String gameName); // returns id of game
-//    @WebMethod int joinGame(int gameId, String userName); // returns your player number in the game
-//    @WebMethod String[] listPlayers(int gameId); // return array of names
-//    @WebMethod boolean destroyGame(int gameId); // true if success
-//    @WebMethod String getGameName(int gameId); // return name of game with a given id
-//    @WebMethod boolean gameIsForming(int gameId);
-//    @WebMethod boolean playerIsCardCzar(int gameId, int playerId);
-//    @WebMethod int getTurnPhase(int gameId); // 0 means normal players are choosing cards, 1 means card czar is choosing card
-//    @WebMethod String[] getHand(int gameId, int playerId);
-//    @WebMethod String getBlackCard(int gameId);
-//    @WebMethod int chooseCard(int gameId, int playerId, int cardNumber); // returns the number of people still choosing
-//    @WebMethod void startNewGame(int gameId);
-//    @WebMethod void reportCurrentStatus();
-//    @WebMethod Integer[] getTurnStatus(int gameId); // returns [turn number][phase number][last chosen card]
-//    @WebMethod Integer[] getScore(int gameId);
-
     public static final int GET_GAMES = 1;
     Integer [] getGames(); // return array of game names
 
