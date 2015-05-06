@@ -1,7 +1,9 @@
 package main.java;
 
 /**
- * Created by Jeff on 5/2/2015.
+ * This InGameData is nothing more than a data type used to pass information about the current state of the game
+ * that a player is already playing. It contains data such as the players current hand, the black card, and whether
+ * or not the player is currently the card czar.
  */
 public class InGameData {
     public String blackCard;

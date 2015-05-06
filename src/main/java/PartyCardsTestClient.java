@@ -3,15 +3,31 @@ package main.java;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
+import java.net.Inet4Address;
 import java.net.URL;
+
 
 public class PartyCardsTestClient {
 
+    /*
+    This is a separate program used to send some basic queries to the server. This file simulates roughly two rounds
+    of gameplay for four players - first creating the game, then joining it, starting the game, and playinng a few
+    cards.
+     */
     public static PartyCardsInterface myInterface;
 
     public static void main(String[] args) throws Exception {
 
-        URL url = new URL("http://" + PartyCardsServer.serverIp + ":52244/ws/partyCards?wsdl");
+        // determine the IP of this computer so it can talk to itself (insert insanity joke here)
+        String serverIp = "";
+        try {
+            serverIp = Inet4Address.getLocalHost().getHostAddress();
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+        }
+
+        URL url = new URL("http://" + serverIp + ":52244/ws/partyCards?wsdl");
 
         //1st argument service URI, refer to wsdl document above
         //2nd argument is service name, refer to wsdl document above
@@ -62,19 +78,6 @@ public class PartyCardsTestClient {
     }
 
 
-    public static void reportGameStatus2() {
-        myInterface.reportCurrentStatus();
-        System.out.println("--report--\n" + arrayToString(myInterface.roundSummary(0)));
-        if(myInterface.playerIsCardCzar(0,0) == 1) {
-            System.out.print("Player 0");
-        }
-        else {
-            System.out.print("Player 1");
-        }
-        System.out.println(" is the current czar");
-        System.out.println("player 0 hand " +arrayToString(myInterface.getHand(0,0)));
-        System.out.println("player 1 hand " +arrayToString(myInterface.getHand(0, 1)));
-    }
 
     public static String arrayToString(String[] input) {
         String output = "";

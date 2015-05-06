@@ -7,13 +7,18 @@ import javax.jws.WebService;
 import java.util.ArrayList;
 import java.util.Collections;
 
-//Service Implementation
+
+/*
+This file actually implements the functions promised by PartyCardsInterface. It includes all of the logic for the
+gameplay - including creating a game, joining a game, starting a game, listing what your hand is, and choosing cards.
+ */
 @WebService(endpointInterface = "main.java.PartyCardsInterface")
 public class PartyCardsInterfaceImpl implements PartyCardsInterface {
     public static final int NO_CARD_SELECTED = -1;
 
     private static final int HANDSIZE = 7;
     private static final int MAX_SIMULTANEOUS_GAMES = 10;
+    private static final int MAX_NUMBER_OF_PLAYERS = 10;
     ArrayList<String> gameNames = new ArrayList<String>();
     ArrayList<ArrayList<String>> playerNames = new ArrayList<ArrayList<String>>(); // names of players in the above games
     ArrayList<Boolean> gameIsNew = new ArrayList<Boolean>(); // true during formation of game
@@ -37,7 +42,8 @@ public class PartyCardsInterfaceImpl implements PartyCardsInterface {
     ArrayList<ArrayList<ArrayList<Integer>>> playerHand = new ArrayList<ArrayList<ArrayList<Integer>>>(); // playerHand[gameId][playerId][cardNumber]
 
 
-
+    @Deprecated
+    // Pass an array of gameIDs of all active games
     @Override
     public Integer[] getGames() {
         ArrayList<Integer> newGames = new ArrayList<Integer>();
@@ -49,7 +55,12 @@ public class PartyCardsInterfaceImpl implements PartyCardsInterface {
         return convertFromArrayList(newGames);
     }
 
-
+    /**
+     * Create a new game with the given name. If there is already a game with that name, it modifies the name
+     * slightly to make it unique.
+     * @param gameName the proposed name for the game to be created
+     * @return gameId  the numerical id of the game that was created, or -1 if there was an error
+     */
     @Override
     public int createNewGame(String gameName) {
 
@@ -116,7 +127,13 @@ public class PartyCardsInterfaceImpl implements PartyCardsInterface {
         return gameId;
     }
 
-
+    /**
+     * Join a certain game that has been created, but has not yet started. If the player name is already in the game,
+     * the ID of the existing player is returned (We assume the player lost a connecting and is re-connecting)
+     * @param gameId   The ID of the game to be joined
+     * @param userName The name of the player that is joining the game
+     * @return userID  An ID of the player in that particular game, or -1 if there was a failure.
+     */
     @Override
     public int joinGame(int gameId, String userName) {
 
@@ -135,6 +152,10 @@ public class PartyCardsInterfaceImpl implements PartyCardsInterface {
             // no username was supplied
             return -1;
         }
+        else if(playerNames.get(gameId).size() >= MAX_NUMBER_OF_PLAYERS) {
+            // the game is full already
+            return -1;
+        }
         else {
             playerNames.get(gameId).add(userName);
             return playerNames.get(gameId).size() - 1; // return the player's id in the game
@@ -142,6 +163,11 @@ public class PartyCardsInterfaceImpl implements PartyCardsInterface {
 
     }
 
+    /**
+     * listPlayers: List the names of each of the players that have joined a particular game
+     * @param gameId The ID of the game in question
+     * @return A array of strings containing the player names in the given game
+     */
     @Override
     public String[] listPlayers(int gameId) {
         if(gameId >= gameNumberIterator || gameId < 0) {
@@ -164,6 +190,13 @@ public class PartyCardsInterfaceImpl implements PartyCardsInterface {
         }
     }
 
+
+    /**
+     * destroyGame: If a game reaches a winning condition or a player decides to end a game, this turns the game
+     * to non-active, allowing another game to take its slot
+     * @param gameId The ID of the game that has finished
+     * @return true on success
+     */
     @Override
     public boolean destroyGame(int gameId) {
         if(gameId >= gameNumberIterator || gameId < 0) {
@@ -175,6 +208,12 @@ public class PartyCardsInterfaceImpl implements PartyCardsInterface {
         }
     }
 
+    /**
+     * getGameName: Fetch the name of a particular game
+     * @param gameId The ID of the game in question
+     * @return The name of the game in question
+     */
+    @Deprecated
     @Override
     public String getGameName(int gameId) {
         if(gameId >= gameNumberIterator || gameId < 0) {
@@ -183,6 +222,12 @@ public class PartyCardsInterfaceImpl implements PartyCardsInterface {
         return gameNames.get(gameId);
     }
 
+    /**
+     * gameIsForming: Fetch status about whether a game is still forming or has started already
+     * @param gameId The ID of the game in question
+     * @return true if the game has not yet started
+     */
+    @Deprecated
     @Override
     public boolean gameIsForming(int gameId) {
         if(gameId >= gameNumberIterator || gameId < 0) {
@@ -192,6 +237,13 @@ public class PartyCardsInterfaceImpl implements PartyCardsInterface {
         return gameIsNew.get(gameId);
     }
 
+    /**
+     * playerIsCardCzar: Determine if a particular player is the card czard of a particular game
+     * @param gameId  The game in question
+     * @param playerId The player in question
+     * @return 0 for normal players, 1 for the current card czar, -1 for errors
+     */
+    @Deprecated
     @Override
     public int playerIsCardCzar(int gameId, int playerId) {
         if(gameId >= gameNumberIterator || gameId < 0) {
@@ -204,6 +256,13 @@ public class PartyCardsInterfaceImpl implements PartyCardsInterface {
         return 0;
     }
 
+    /**
+     * getTurnPhase: Returns the current turn phase of the current game. Turn phase 1 means the normal players
+     * are choosing their cards. Turn phase 2 means the card czar is choosing their card.
+     * @param gameId The ID of the game in question
+     * @return 1 for normal player phase, 2 for card czar phase, -1 for error.
+     */
+    @Deprecated
     @Override
     public int getTurnPhase(int gameId) {
         if(gameId >= gameNumberIterator || gameId < 0) {
@@ -213,6 +272,15 @@ public class PartyCardsInterfaceImpl implements PartyCardsInterface {
         return turnPhase.get(gameId);
     }
 
+    /**
+     * getHand: Get the text of the cards in the current player's hand. This was originally intended to be
+     * used as a webservice function, but that functionality was deprecated. It is now used as part of the
+     * getInGameData function.
+     * @param gameId The ID of the current game
+     * @param playerId The ID of the current player
+     * @return An array of strings, one string per card. During times when the player isn't choosing a card, it will
+     * return additional data about the game (score, turn number, and which card won the previous round)
+     */
     @Override
     public String[] getHand(int gameId, int playerId) {
         if(gameId >= gameNumberIterator || gameId < 0) {
@@ -277,6 +345,12 @@ public class PartyCardsInterfaceImpl implements PartyCardsInterface {
     }
 
 
+    /**
+     * getBlackCard: This was originally intended as a webservice function, but is now only used for the getInGameData.
+     * It returns the text of the current black card for the given game.
+     * @param gameId The ID of the game in question
+     * @return The text of the current black card
+     */
     @Override
     public String getBlackCard(int gameId) {
         if(gameId >= gameNumberIterator || gameId < 0) {
@@ -288,6 +362,16 @@ public class PartyCardsInterfaceImpl implements PartyCardsInterface {
         return PartyCardsServer.blackCards.get(indexInUnshuffledDeck ).content;
     }
 
+    /**
+     * chooseCard: This is the function that players call when they make their choice about a particular card.
+     * Each time the function is called, it check to see if everyone has made a choice. If everyone has made a choice,
+     * it advances the game to the next phase or the next turn, depending on which phase it is currently in.
+     * @param gameId The game in quesion
+     * @param playerId The ID of the player making the choice
+     * @param cardNumber The position of the card in the players hand (typically 0 through 6)
+     * @return An int of the number of players still choosing that round, so they can know if they need to update
+     * the InGameData immediately (or potentially report about how many players they're waiting on)
+     */
     @Override
     public int chooseCard(int gameId, int playerId, int cardNumber) {
         if(gameId >= gameNumberIterator || gameId < 0) {
@@ -311,7 +395,6 @@ public class PartyCardsInterfaceImpl implements PartyCardsInterface {
             // remember this round's card czar selection
             lastRoundCard.set(gameId, playerHand.get(gameId).get(winningPlayer).get(playerCardSelection.get(gameId).get(winningPlayer)));
             lastRoundWinningPlayer.set(gameId, winningPlayer);
-//            System.out.println("dealing next cards");
             dealNextTurn(gameId);
 
             return 0;
@@ -330,17 +413,11 @@ public class PartyCardsInterfaceImpl implements PartyCardsInterface {
 
             // if the round phase is over, proceed to the next phase
             int playersStillSelecting = 0;
-//            System.out.println("Players still selecting: " + toString(playerCardSelection.get(gameId)));
-//            System.out.println("playerNames.get(gameId).size(): " + playerNames.get(gameId).size());
-//            System.out.println("currentCardCzar.get(gameId): " + currentCardCzar.get(gameId));
             for(int playerIterator = 0; playerIterator < playerNames.get(gameId).size(); playerIterator++) {
-                // we're done if all non-czar players have made a selection
-//                System.out.println("playerCardSelection.get(gameId).get(playerId): " + playerCardSelection.get(gameId).get(playerId));
                 if((currentCardCzar.get(gameId) != playerIterator) && (playerCardSelection.get(gameId).get(playerIterator) == -1)) {
                     playersStillSelecting++;
                 }
             }
-//            System.out.println("playersStillSelecting: " + playersStillSelecting);
             if(playersStillSelecting == 0) {
                 // proceeding to phase 2
                 turnPhase.set(gameId, 2);
@@ -379,6 +456,11 @@ public class PartyCardsInterfaceImpl implements PartyCardsInterface {
 
     }
 
+    /**
+     * increment: Internal use only, used to increment a value of an ArrayList element
+     * @param array name of array
+     * @param index index of element to increment
+     */
     private void increment(ArrayList<Integer> array, int index) {
         array.set(index, array.get(index) + 1);
     }
@@ -404,6 +486,12 @@ public class PartyCardsInterfaceImpl implements PartyCardsInterface {
         }
         return output;
     }
+
+    /**
+     * fill: Fill an ArrayList with a particular value. Used mostly for re-initializing an ArrayList
+     * @param array the array to fill
+     * @param value the value to fill the array with
+     */
     private void fill(ArrayList<Integer> array, int value) {
         for(int i = 0; i < array.size(); i++) {
             array.set(i, value);
@@ -416,13 +504,15 @@ public class PartyCardsInterfaceImpl implements PartyCardsInterface {
         System.out.println(before);
         for(int i = 0; i < after.length; i++) {
             after[i] = before.get(i);
-//            System.out.println("Game in session: " + after[i]);
         }
         return after;
     }
 
+    /**
+     * reportCurrentStatus: Called by a remote service when you wish to have the server report what the value of many
+     * of its variables. This is used primarily for debugging purposes.
+     */
     public void reportCurrentStatus() {
-
         System.out.println("\n\n-----");
         for(int gameId = 0; gameId < gameNumberIterator; gameId++) {
             System.out.print("Game " + gameId + ", name: " + gameNames.get(gameId) + ", Players: ");
@@ -444,7 +534,12 @@ public class PartyCardsInterfaceImpl implements PartyCardsInterface {
         }
     }
 
-    // returns [turn number][phase number][last chosen card]
+    /**
+     * getTurnStatus: Get some information about the turn of the current game. Not used
+     * @param gameId The ID of the game in question
+     * @return A 3 valued array: {turn number, phase number, last chosen card}
+     */
+    @Deprecated
     @Override
     public Integer[] getTurnStatus(int gameId) {
         if(gameId >= gameNumberIterator || gameId < 0) {
@@ -473,6 +568,12 @@ public class PartyCardsInterfaceImpl implements PartyCardsInterface {
         return output;
     }
 
+    /**
+     * getScore: Not used. Was initially intended to return the score of each player in the game
+     * @param gameId The ID of the game in question
+     * @return An array of the current score of each player
+     */
+    @Deprecated
     @Override
     public Integer[] getScore(int gameId) {
         if(gameId >= gameNumberIterator || gameId < 0) {
@@ -486,6 +587,13 @@ public class PartyCardsInterfaceImpl implements PartyCardsInterface {
         return output;
     }
 
+    /**
+     * roundSummary: Not used. Was originally intended to report about the current state of the game
+     * (Score and turn number)
+     * @param gameId The game in question
+     * @return An array of strings. {The last rounds winner, the score, the current turn}
+     */
+    @Deprecated
     @Override
     public String[] roundSummary(int gameId) {
         if(gameId >= gameNumberIterator || gameId < 0) {
@@ -513,7 +621,13 @@ public class PartyCardsInterfaceImpl implements PartyCardsInterface {
         return output;
     }
 
-
+    /**
+     * getGameData: Return all the important information for one player about a game that is currently in progress.
+     * @param gameId The ID of the game in question
+     * @param playerId The ID of the player requesting the data
+     * @return InGameData about everthing the player needs to know - Their current hand, the black card, if they're the
+     * card czar, etc
+     */
     public InGameData getGameData(int gameId, int playerId) {
         if(gameId >= gameNumberIterator || gameId < 0 || playerId >= playerNames.get(gameId).size() || playerId < 0) {
             //gameId is out of bounds
@@ -552,6 +666,11 @@ public class PartyCardsInterfaceImpl implements PartyCardsInterface {
         return game;
     }
 
+    /**
+     * getBasicGameData: returns some of the data about a current game. Intended to be used before a player has joined.
+     * This returns a complete list of all the games the server is currently running.
+     * @return BasicGameData []: Game name, ID, whether the game has started, the names of the players in the game
+     */
     @Override
     public BasicGameData [] getBasicGameData() {
         BasicGameData [] output = new BasicGameData[gameNumberIterator];
@@ -565,6 +684,12 @@ public class PartyCardsInterfaceImpl implements PartyCardsInterface {
         return output;
     }
 
+    /**
+     * getBasicGameDataSingleGame: request the game data for one particular game. Intended to be used after a player
+     * has chosen a game and possibly joined, but before they are in the normal gameplay window
+     * @param gameId The ID of the game in question
+     * @return BasicGameData about the current game - (name, id, whether it has started, and who is in the game)
+     */
     @Override
     public BasicGameData getBasicGameDataSingleGame(int gameId) {
         if(gameId >= gameNumberIterator || gameId < 0) {
@@ -578,6 +703,10 @@ public class PartyCardsInterfaceImpl implements PartyCardsInterface {
         return output;
     }
 
+    /**
+     * startNewGame: After enough players have joined the game, this starts the game, preventing anyone else from joining
+     * @param gameId The ID of the game to be started
+     */
     public void startNewGame(int gameId) {
         if(!gameIsNew.get(gameId)) {
             return; // game has already started
@@ -653,9 +782,21 @@ public class PartyCardsInterfaceImpl implements PartyCardsInterface {
         }
         return output;
     }
+
+    /**
+     * getWhiteCardString: For internal use only. Get the text on a particular card
+     * @param indexNumber The index of the card in whitecards.txt
+     * @return A string of the text on the card.
+     */
     private String getWhiteCardString(int indexNumber) {
         return PartyCardsServer.whiteCards.get(indexNumber).content;
     }
+
+    /**
+     * generateScoreReport: Creates a multi-line string that displays the current score of each player
+     * @param gameId The ID of the game in question
+     * @return
+     */
     private String generateScoreReport(int gameId) {
         String output = "Round " + turnNumber.get(gameId) + " score:\n";
         for(int playerId = 0; playerId < playerNames.get(gameId).size(); playerId++) {

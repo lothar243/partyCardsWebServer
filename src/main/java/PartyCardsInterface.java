@@ -5,7 +5,11 @@ import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
 import javax.jws.soap.SOAPBinding.Style;
 
-//Service Endpoint Interface
+/*
+This interface spells out the promised services. It is used both to ensure those functions have the correct
+argument and output types, and it is also used to generate the WSDL file.
+ */
+
 @WebService
 @SOAPBinding(style = Style.RPC)
 public interface PartyCardsInterface {

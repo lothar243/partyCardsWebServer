@@ -13,7 +13,8 @@ import java.util.ArrayList;
 // Jeff Arends, Lee Curran, Angela Gross, Andrew Meissner
 // Spring 2015
 // --------------------------------------------------------------------------------------------------------------------
-// This is the file input and output class. It reads the card file in, as well as the user config file.
+// This is the file input and output class. It reads the card files in and outputs arrayLists of those cards.
+// The card files should contain the text of one card on each line.
 // ====================================================================================================================
 
 public class FileIO {
