@@ -8,7 +8,7 @@ import java.util.ArrayList;
 // ====================================================================================================================
 // FileIO.java
 // --------------------------------------------------------------------------------------------------------------------
-// Party Cards: Android Networking Project
+// Party Cards Server: Android Networking Project
 // CSCI-466: Networks
 // Jeff Arends, Lee Curran, Angela Gross, Andrew Meissner
 // Spring 2015
@@ -17,9 +17,15 @@ import java.util.ArrayList;
 // The card files should contain the text of one card on each line.
 // ====================================================================================================================
 
-public class FileIO {
+public class FileIO 
+{
+	 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	// FILEIO ATTRIBUTES
     public static final String BLACK_CARDS_FILENAME = "blackcards.txt";
     public static final String WHITE_CARDS_FILENAME = "whitecards.txt";
+    
+	 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     // \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
     // READERS
@@ -31,7 +37,8 @@ public class FileIO {
     // Reads in from <filename>, a list of strings representing the text to be displayed on the white cards.
     // @return - A "pile" of cards.
     // ===============================================================================================================
-    public ArrayList<Card> readCards(String filename) {
+    public ArrayList<Card> readCards(String filename) 
+    {
         ArrayList<Card> cards = new ArrayList<Card>();
 
         try
@@ -39,7 +46,8 @@ public class FileIO {
             FileReader FileIO = new FileReader(filename);
             BufferedReader in = new BufferedReader(FileIO);
             String nextLine;
-            while((nextLine = in.readLine()) != null) {
+            while((nextLine = in.readLine()) != null) 
+            {
                 cards.add(new Card(nextLine));
             }
             in.close();

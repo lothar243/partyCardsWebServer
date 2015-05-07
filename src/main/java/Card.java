@@ -3,7 +3,7 @@ package main.java;
 // ====================================================================================================================
 // Card.java
 // --------------------------------------------------------------------------------------------------------------------
-// Party Cards: Android Networking Project
+// Party Cards Server: Android Networking Project
 // CSCI-466: Networks
 // Jeff Arends, Lee Curran, Angela Gross, Andrew Meissner
 // Spring 2015

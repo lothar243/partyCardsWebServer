@@ -1,20 +1,27 @@
 package main.java;
 
-
 import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
 import javax.jws.soap.SOAPBinding.Style;
 
-/*
-This interface spells out the promised services. It is used both to ensure those functions have the correct
-argument and output types, and it is also used to generate the WSDL file.
- */
+// ====================================================================================================================
+// PartyCardsInterface.java
+// --------------------------------------------------------------------------------------------------------------------
+// Party Cards Server: Android Networking Project
+// CSCI-466: Networks
+// Jeff Arends, Lee Curran, Angela Gross, Andrew Meissner
+// Spring 2015
+// --------------------------------------------------------------------------------------------------------------------
+// This interface spells out the promised services. It is used both to ensure those functions have the correct
+// argument and output types, and it is also used to generate the WSDL file.
+// ====================================================================================================================
 
 @WebService
 @SOAPBinding(style = Style.RPC)
-public interface PartyCardsInterface {
-
-
+public interface PartyCardsInterface 
+{
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
     public static final int GET_GAMES = 1;
     Integer [] getGames(); // return array of game names
 
@@ -74,4 +81,6 @@ public interface PartyCardsInterface {
 
     public static final int GET_BASIC_GAME_DATA_SINGLE_GAME = 20;
     BasicGameData getBasicGameDataSingleGame(int gameId);
+    
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 }

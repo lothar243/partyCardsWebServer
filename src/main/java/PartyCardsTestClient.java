@@ -1,29 +1,42 @@
 package main.java;
 
-
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 import java.net.Inet4Address;
 import java.net.URL;
 
+// ====================================================================================================================
+// PartyCardsTestClient.java
+// --------------------------------------------------------------------------------------------------------------------
+// Party Cards Server: Android Networking Project
+// CSCI-466: Networks
+// Jeff Arends, Lee Curran, Angela Gross, Andrew Meissner
+// Spring 2015
+// --------------------------------------------------------------------------------------------------------------------
+// This is a separate program used to send some basic queries to the server. This file simulates roughly two rounds
+// of gameplay for four players - first creating the game, then joining it, starting the game, and playinng a few
+// cards.
+// =====================================================================================================================
 
-public class PartyCardsTestClient {
-
-    /*
-    This is a separate program used to send some basic queries to the server. This file simulates roughly two rounds
-    of gameplay for four players - first creating the game, then joining it, starting the game, and playinng a few
-    cards.
-     */
+public class PartyCardsTestClient 
+{
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
     public static PartyCardsInterface myInterface;
 
-    public static void main(String[] args) throws Exception {
-
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+    // MAIN METHOD
+    public static void main(String[] args) throws Exception 
+    {
         // determine the IP of this computer so it can talk to itself (insert insanity joke here)
         String serverIp = "";
-        try {
+        try 
+        {
             serverIp = Inet4Address.getLocalHost().getHostAddress();
         }
-        catch(Exception e) {
+        catch(Exception e) 
+        {
             e.printStackTrace();
         }
 
@@ -63,12 +76,16 @@ public class PartyCardsTestClient {
         reportGameStatus();
 
         myInterface.getBasicGameData();
-
-
-
     }
+    
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+    // \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+    // HELPER METHODS
+    // \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
-    public static void reportGameStatus() {
+    public static void reportGameStatus() 
+    {
         System.out.println("\n ----");
         myInterface.reportCurrentStatus();
         System.out.println("player 0: " + myInterface.getGameData(0, 0).toString());
@@ -77,26 +94,33 @@ public class PartyCardsTestClient {
         System.out.println("player 3: " + myInterface.getGameData(0, 3).toString());
     }
 
-
-
-    public static String arrayToString(String[] input) {
+    public static String arrayToString(String[] input) 
+    {
         String output = "";
-        if(input.length > 0) {
+        if(input.length > 0) 
+        {
             output = input[0];
         }
-        for(int i = 1; i < input.length; i++) {
+        for(int i = 1; i < input.length; i++) 
+        {
             output += ", " + i + " " + input[i];
         }
         return output;
     }
-    public static String arrayToString(Integer[] input) {
+    
+    public static String arrayToString(Integer[] input) 
+    {
         String output = "";
-        if(input.length > 0) {
+        if(input.length > 0) 
+        {
             output = input[0].toString();
         }
-        for(int i = 1; i < input.length; i++) {
+        for(int i = 1; i < input.length; i++) 
+        {
             output += ", " + input[i];
         }
         return output;
     }
+    
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 }

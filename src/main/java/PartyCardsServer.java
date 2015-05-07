@@ -1,38 +1,53 @@
 package main.java;
 
-/**
- * This is the entry
- */
 import javax.xml.ws.Endpoint;
 import java.net.Inet4Address;
 import java.util.ArrayList;
 
+// ====================================================================================================================
+// PartyCardsServer.java
+// --------------------------------------------------------------------------------------------------------------------
+// Party Cards Server: Android Networking Project
+// CSCI-466: Networks
+// Jeff Arends, Lee Curran, Angela Gross, Andrew Meissner
+// Spring 2015
+// --------------------------------------------------------------------------------------------------------------------
+// This is the main point of entry to the server.
+//=====================================================================================================================
 
-//Endpoint publisher
-public class PartyCardsServer {
+// Endpoint publisher
+public class PartyCardsServer 
+{
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
     /* when running the server, this IP address is automatically generated and output to the screen. Changing
-    it in the code is only necessary if you wish to use the additional clients for debugging (promptServerToReportData
+    it in the code is only necessary if you wish to use the additional clients for debugging (promptServerToReportData)
      */
-
     public static String serverIp;
-
     public static ArrayList<Card> whiteCards;
     public static ArrayList<Card> blackCards;
-    public static void main(String[] args) {
-        try {
+    
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+    // MAIN METHOD
+    public static void main(String[] args) 
+    {
+        try 
+        {
             serverIp = Inet4Address.getLocalHost().getHostAddress();
         }
-        catch(Exception e) {
+        catch(Exception e) 
+        {
             e.printStackTrace();
         }
+        
         FileIO cardReader = new FileIO();
         whiteCards = cardReader.readCards(FileIO.WHITE_CARDS_FILENAME);
         blackCards = cardReader.readCards(FileIO.BLACK_CARDS_FILENAME);
 
-
         System.setProperty("javax.xml.bind.JAXBContext", "com.sun.xml.internal.bind.v2.ContextFactory");
 
-
+        
         /* changing settings about whether or not to output debugging info. Set debug to true if you wish to see
         each incoming and outgoing xml file, along with other connection data.
          */
@@ -50,5 +65,6 @@ public class PartyCardsServer {
          */
         Endpoint.publish("http://" + serverIp + ":52244/ws/partyCards", new PartyCardsInterfaceImpl());
     }
-
+    
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 }
